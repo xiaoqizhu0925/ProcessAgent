@@ -6,7 +6,7 @@ from autogen_agentchat.ui import Console
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.teams import SelectorGroupChat
 from autogen_agentchat.messages import AgentEvent, ChatMessage
-from autogen_ext.models.openai import OpenAIChatCompletionClient
+from gemini_client import GeminiChatCompletionClient
 from autogen_core.memory import ListMemory, MemoryContent, MemoryMimeType
 from autogen_agentchat.conditions import TextMentionTermination
 from autogen_ext.agents.web_surfer import MultimodalWebSurfer
@@ -53,14 +53,52 @@ from agent_helper_function import calculate_params_tool, validate, add_context
 
 import agent_helper_function
 
+class GeminiChatCompletionClient:
+    def __init__(self, model=None, temperature=0.7, base_url=None, **kwargs):
+        """Initialize Gemini chat client.
+        
+        Args:
+            model: Model name to use
+            temperature: Sampling temperature
+            base_url: Ignored for Gemini (kept for compatibility)
+            **kwargs: Additional arguments are ignored
+        """
+        self.model = model
+        self.temperature = temperature
+        # Note: api_key should be configured using genai.configure() before creating client
+        
+    async def create(self, messages, temperature=None):
+        model = genai.GenerativeModel(self.model)
+        chat = model.start_chat()
+        
+        # Convert messages to Gemini format
+        for msg in messages:
+            role = msg["role"]
+            content = msg["content"]
+            
+            if role == "assistant":
+                chat.send_message(content)
+            elif role == "user":
+                response = chat.send_message(content)
+        
+        # Get the last response
+        try:
+            last_response = response.text
+        except Exception as e:
+            print(f"Error getting Gemini response: {e}")
+            last_response = "Error: Failed to get response from Gemini"
+            
+        return {"choices": [{"message": {"content": last_response}}]}
+
 async def run_main(initial_params, metric, context, llm_config):
 
-    model_client = OpenAIChatCompletionClient(
-        api_key=llm_config["api_key"],
-        model=llm_config["model"],
-        base_url=llm_config["base_url"],
-        model_info=llm_config["model_info"], 
-        # temperature=0.3
+    # Configure Gemini globally
+    genai.configure(api_key=llm_config.get('api_key'))
+    
+    # Create chat client without passing api_key
+    model_client = GeminiChatCompletionClient(
+        model=llm_config.get('model'),
+        temperature=0.7
     )
 
     validator_agent = AssistantAgent(

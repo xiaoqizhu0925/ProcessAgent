@@ -6,7 +6,7 @@ from autogen_agentchat.ui import Console
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.teams import SelectorGroupChat
 from autogen_agentchat.messages import AgentEvent, ChatMessage
-from autogen_ext.models.openai import OpenAIChatCompletionClient
+from gemini_client import GeminiChatCompletionClient
 from autogen_core.memory import ListMemory, MemoryContent, MemoryMimeType
 from autogen_agentchat.conditions import TextMentionTermination
 from autogen_ext.agents.web_surfer import MultimodalWebSurfer

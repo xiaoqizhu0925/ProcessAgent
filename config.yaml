@@ -25,16 +25,22 @@ Optimization:
 # Model Configuration
 # ===========================
 Model:
-  model: "o3-2025-04-16"
-  api_key: ""
-  base_url: "https://api.openai.com/v1"
+  model: "models/gemini-pro-latest"  # 默认使用最新版本
+  alternative_models: [  # 备选模型列表
+    "models/gemini-2.5-pro",
+    "models/gemini-2.5-pro-preview-06-05",
+    "models/gemini-pro-latest"
+  ]
+  api_key: "AIzaSyCNfGYhNi7AXQXWmXYEaG9s2UodPlHj48o"
+  base_url: "https://generativelanguage.googleapis.com/v1"
   model_info:
-    model: "o3-2025-04-16"
-    provider: "openai"
+    provider: "google"
     mode: "chat"
     is_chat_model: true
     max_tokens: 30000
+    temperature: 0.7
+    top_p: 0.95
     vision: false
     function_calling: true
     json_output: true
-    family: "gpt-4"
+    family: "gemini"
